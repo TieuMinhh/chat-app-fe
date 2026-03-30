@@ -1,0 +1,97 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/stores/authStore';
+import { useChatStore } from '@/stores/chatStore';
+import { ConversationList } from '@/components/chat/ConversationList';
+import api from '@/lib/axios';
+import { LogOut, MessageCircle, Home } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { ProfileModal } from '@/components/chat/ProfileModal';
+import { getSocket } from '@/lib/socket';
+
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const { user, logout: authLogout } = useAuthStore();
+  const { setConversations } = useChatStore();
+  const [showProfile, setShowProfile] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const res = await api.get('/conversations');
+        setConversations(res.data.data);
+      } catch (error) {
+        console.error('Failed to fetch conversations:', error);
+      }
+    };
+    fetchConversations();
+  }, [setConversations]);
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {}
+    authLogout();
+    router.push('/login');
+    toast.success('Đã đăng xuất');
+  };
+
+  return (
+    <div className="flex h-screen bg-gray-950 overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-[360px] flex flex-col border-r border-white/5 bg-(--bg-secondary)">
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+          <button
+            onClick={() => setShowProfile(true)}
+            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-white/5 transition-all text-left"
+          >
+            <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
+              {user?.avatar ? (
+                <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </div>
+              )}
+            </div>
+            <div>
+              <h1 className="text-sm font-semibold text-white">{user?.displayName || user?.username}</h1>
+              <p className="text-xs text-gray-500 hover:text-indigo-400 transition-colors">Cài đặt</p>
+            </div>
+          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => router.push('/chat')}
+              className="p-2 rounded-lg text-gray-500 hover:text-indigo-400 hover:bg-white/5 transition-all"
+              title="Trang chủ"
+            >
+              <Home className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-white/5 transition-all"
+              title="Đăng xuất"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <ConversationList />
+        
+        {/* Profile Modal */}
+        {showProfile && (
+          <ProfileModal onClose={() => setShowProfile(false)} />
+        )}
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
+        {children}
+      </div>
+    </div>
+  );
+}
