@@ -6,10 +6,11 @@ import { useChatStore } from '@/stores/chatStore';
 import { Conversation } from '@/types';
 import { formatLastSeen } from '@/lib/utils';
 import api from '@/lib/axios';
-import { Phone, Video, Users, Info, Ban, ShieldOff, MoreVertical, Pin } from 'lucide-react';
+import { Phone, Video, Users, Info, Ban, ShieldOff, MoreVertical, Pin, ArrowLeft } from 'lucide-react';
 import { GroupInfoPanel } from './GroupInfoPanel';
 import { PinnedMessagesPanel } from './PinnedMessagesPanel';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 interface ChatHeaderProps {
   conversationId: string;
@@ -17,6 +18,7 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ conversationId, onBlockStatusChange }: ChatHeaderProps) {
+  const router = useRouter();
   const { user } = useAuthStore();
   const { conversations, onlineUsers } = useChatStore();
   const [fetchedConversation, setFetchedConversation] = useState<Conversation | null>(null);
@@ -119,55 +121,65 @@ export function ChatHeader({ conversationId, onBlockStatusChange }: ChatHeaderPr
 
   return (
     <>
-      <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 glass">
-        <div
-          onClick={() => isGroup && setShowGroupInfo(true)}
-          className={`flex items-center gap-3 ${isGroup ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
-          role={isGroup ? 'button' : undefined}
-        >
-          {/* Avatar */}
-          <div className="relative shrink-0">
-            {isGroup ? (
-              conversation.avatar ? (
-                <img src={conversation.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-purple-400" />
-                </div>
-              )
-            ) : otherUser?.avatar ? (
-              <img src={otherUser.avatar} alt={displayName} className="w-10 h-10 rounded-full object-cover" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-400 font-semibold text-sm">
-                {avatarText}
-              </div>
-            )}
-            {isOnline && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-(--bg-secondary) online-pulse" />
-            )}
-          </div>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 glass">
+        <div className="flex items-center gap-1 md:gap-3">
+          {/* Back Button (Mobile Only) */}
+          <button 
+            onClick={() => router.push('/chat')}
+            className="md:hidden p-2 -ml-2 text-gray-500 hover:text-white transition-all"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
 
-          {/* Info */}
-          <div className="flex flex-col text-left">
-            <h2 className="text-sm font-semibold text-white">{displayName}</h2>
-            {blockStatus.blocked ? (
-              <p className="text-xs text-red-400">
-                {blockStatus.blockedBy === user?._id ? 'Đã chặn người này' : 'Đã bị chặn'}
-              </p>
-            ) : statusText ? (
-              <p className={`text-xs truncate ${isOnline || onlineMemberCount > 0 ? 'text-emerald-400' : 'text-gray-500'}`}>
-                {statusText}
-              </p>
-            ) : null}
+          <div
+            onClick={() => isGroup && setShowGroupInfo(true)}
+            className={`flex items-center gap-3 ${isGroup ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+            role={isGroup ? 'button' : undefined}
+          >
+            {/* Avatar */}
+            <div className="relative shrink-0">
+              {isGroup ? (
+                conversation.avatar ? (
+                  <img src={conversation.avatar} alt="" className="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-linear-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-purple-400" />
+                  </div>
+                )
+              ) : otherUser?.avatar ? (
+                <img src={otherUser.avatar} alt={displayName} className="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover" />
+              ) : (
+                <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-400 font-semibold text-sm">
+                  {avatarText}
+                </div>
+              )}
+              {isOnline && (
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-(--bg-secondary) online-pulse" />
+              )}
+            </div>
+
+            {/* Info */}
+            <div className="flex flex-col text-left max-w-[150px] sm:max-w-xs">
+              <h2 className="text-sm font-semibold text-white truncate">{displayName}</h2>
+              {blockStatus.blocked ? (
+                <p className="text-[10px] md:text-xs text-red-400">
+                  {blockStatus.blockedBy === user?._id ? 'Đã chặn người này' : 'Đã bị chặn'}
+                </p>
+              ) : statusText ? (
+                <p className={`text-[10px] md:text-xs truncate ${isOnline || onlineMemberCount > 0 ? 'text-emerald-400' : 'text-gray-500'}`}>
+                  {statusText}
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1">
-          <button className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+        <div className="flex items-center gap-0.5 md:gap-1">
+          <button className="hidden sm:flex p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all">
             <Phone className="w-4 h-4" />
           </button>
-          <button className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+          <button className="hidden sm:flex p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all">
             <Video className="w-4 h-4" />
           </button>
 

@@ -4,6 +4,7 @@ import { Message, Conversation } from '@/types';
 import { X, Pin, MessageSquare, Trash2 } from 'lucide-react';
 import { formatMessageTime } from '@/lib/utils';
 import { getSocket } from '@/lib/socket';
+import { useChatStore } from '@/stores/chatStore';
 
 interface PinnedMessagesPanelProps {
   conversation: Conversation;
@@ -40,7 +41,10 @@ export function PinnedMessagesPanel({ conversation, onClose }: PinnedMessagesPan
             <p className="text-xs text-gray-500 mt-1">Ghim những tin nhắn quan trọng để mọi người dễ dàng tìm thấy.</p>
           </div>
         ) : (
-          pinnedMessages.map((msg) => {
+          pinnedMessages.map((msgOrId) => {
+            const msg = typeof msgOrId === 'string' 
+              ? (useChatStore.getState().messages[conversation._id]?.find((m: Message) => m._id === msgOrId) || { _id: msgOrId } as unknown as Message)
+              : msgOrId;
             const sender = typeof msg.senderId === 'object' ? msg.senderId : null;
             return (
               <div key={msg._id} className="group relative bg-white/5 rounded-xl p-3 border border-white/5 hover:border-white/10 transition-all">
@@ -58,10 +62,10 @@ export function PinnedMessagesPanel({ conversation, onClose }: PinnedMessagesPan
                     <p className="text-[11px] font-bold text-indigo-400 truncate">
                       {sender?.displayName || sender?.username || 'Người dùng'}
                     </p>
-                    <p className="text-[10px] text-gray-500 uppercase font-medium">
-                      {formatMessageTime(msg.createdAt)}
-                    </p>
-                  </div>
+            <p className="text-[10px] text-gray-500 uppercase font-medium">
+              {msg.createdAt ? formatMessageTime(msg.createdAt) : '...'}
+            </p>
+          </div>
                   <button 
                     onClick={() => handleUnpin(msg._id)}
                     className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/10 rounded-lg text-gray-500 hover:text-red-400 transition-all"
@@ -80,7 +84,13 @@ export function PinnedMessagesPanel({ conversation, onClose }: PinnedMessagesPan
                 </div>
 
                 <div className="mt-2 flex justify-end">
-                   <button className="text-[10px] text-indigo-400 hover:underline flex items-center gap-1">
+                   <button 
+                     onClick={() => {
+                        useChatStore.getState().setScrollToMessageId(msg._id);
+                        onClose();
+                     }}
+                     className="text-[10px] text-indigo-400 hover:underline flex items-center gap-1"
+                   >
                      <MessageSquare className="w-3 h-3" /> Xem trong cuộc trò chuyện
                    </button>
                 </div>

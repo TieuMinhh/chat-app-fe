@@ -9,7 +9,7 @@ import { ChatHeader } from '@/components/chat/ChatHeader';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { MessageInput } from '@/components/chat/MessageInput';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
-import { Loader2, Ban, Pin } from 'lucide-react';
+import { Loader2, Ban, Pin, ArrowDown } from 'lucide-react';
 import { MessagesResponse } from '@/types';
 
 export default function ChatRoomPage({ params }: { params: Promise<{ conversationId: string }> }) {
@@ -24,6 +24,9 @@ export default function ChatRoomPage({ params }: { params: Promise<{ conversatio
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const isInitialLoad = useRef(true);
+  const { scrollToMessageId, setScrollToMessageId } = useChatStore();
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
 
   const currentMessages = messages[conversationId] || [];
   const currentConversation = conversations.find(c => c._id === conversationId);
@@ -69,13 +72,26 @@ export default function ChatRoomPage({ params }: { params: Promise<{ conversatio
 
   // Auto scroll to bottom on new messages
   useEffect(() => {
-    if (!isLoading && messagesEndRef.current) {
+    if (!isLoading && messagesEndRef.current && !showScrollToBottom) {
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: isInitialLoad.current ? 'instant' : 'smooth' });
         isInitialLoad.current = false;
       }, 50);
     }
-  }, [conversationId, currentMessages.length, isLoading]);
+  }, [conversationId, currentMessages.length, isLoading, showScrollToBottom]);
+
+  // Handle scrollToMessageId from store
+  useEffect(() => {
+    if (scrollToMessageId) {
+      const element = document.getElementById(`msg-${scrollToMessageId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setHighlightedMessageId(scrollToMessageId);
+        setTimeout(() => setHighlightedMessageId(null), 2000);
+      }
+      setScrollToMessageId(null);
+    }
+  }, [scrollToMessageId, setScrollToMessageId]);
 
   // Load more messages (scroll up)
   const loadMoreMessages = async () => {
@@ -110,138 +126,166 @@ export default function ChatRoomPage({ params }: { params: Promise<{ conversatio
   // Handle scroll
   const handleScroll = () => {
     const container = messagesContainerRef.current;
-    if (container && container.scrollTop < 50) {
+    if (!container) return;
+
+    if (container.scrollTop < 50) {
       loadMoreMessages();
     }
+
+    // Show scroll to bottom button if we are more than 300px from bottom
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 300;
+    setShowScrollToBottom(!isNearBottom);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-(--bg-primary)">
-        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-      </div>
-    );
-  }
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-(--bg-primary) min-h-0 overflow-hidden">
       <ChatHeader conversationId={conversationId} onBlockStatusChange={setBlockStatus} />
-
-      {/* Messages */}
-      <div
-        ref={messagesContainerRef}
-        onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-1"
-      >
-        {isLoadingMore && (
-          <div className="flex justify-center py-2">
-            <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
-          </div>
-        )}
-
-        {currentMessages.map((message, index) => {
-          const senderId = typeof message.senderId === 'object' ? message.senderId._id : message.senderId;
-          const isMine = senderId === user?._id;
-          const showAvatar =
-            !isMine &&
-            (index === 0 ||
-              (() => {
-                const prevMsg = currentMessages[index - 1];
-                const prevSender = prevMsg?.senderId;
-                const prevSenderId = prevSender && typeof prevSender === 'object'
-                  ? (prevSender as { _id: string })._id
-                  : prevSender;
-                return prevSenderId !== senderId;
-              })());
-
-          const isGroup = currentConversation?.type === 'group';
-          const otherMember = !isGroup
-            ? currentConversation?.members.find((m) => {
-                const mId = typeof m.userId === 'object' ? m.userId._id : m.userId;
-                return mId !== user?._id;
-              })
-            : null;
-          const otherUserAvatar = typeof otherMember?.userId === 'object' ? otherMember.userId.avatar : null;
-
-          const handleReact = (emoji: string) => {
-            const socket = getSocket();
-            if (!socket) return;
-            
-            const hasReacted = message.reactions?.find(r => r.userId === user?._id && r.emoji === emoji);
-            if (hasReacted) {
-              socket.emit('remove_reaction', { messageId: message._id, conversationId, emoji });
-            } else {
-              socket.emit('add_reaction', { messageId: message._id, conversationId, emoji });
-            }
-          };
-
-          const handleReply = () => {
-             useChatStore.getState().setReplyingTo(message);
-          };
-
-          const handleEdit = () => {
-             useChatStore.getState().setEditingMessage(message);
-          };
-
-          const handleDelete = () => {
-            if (window.confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')) {
-              const socket = getSocket();
-              socket?.emit('delete_message', { messageId: message._id, conversationId });
-            }
-          };
-
-          const handlePin = () => {
-            const socket = getSocket();
-            const isPinned = currentConversation?.pinnedMessages?.includes(message._id);
-            if (isPinned) {
-              socket?.emit('unpin_message', { messageId: message._id, conversationId });
-            } else {
-              socket?.emit('pin_message', { messageId: message._id, conversationId });
-            }
-          };
-
-          return (
-            <div key={message._id || message.tempId} className="relative">
-              {currentConversation?.pinnedMessages?.includes(message._id) && (
-                <div className="flex items-center gap-1.5 ml-12 mb-1 animate-in fade-in slide-in-from-left-2">
-                   <Pin className="w-3 h-3 text-indigo-400 fill-indigo-400/20" />
-                   <span className="text-[10px] text-gray-500 font-medium">Đã ghim</span>
-                </div>
-              )}
-              <MessageBubble
-                message={message}
-                isMine={isMine}
-                showAvatar={showAvatar}
-                showSenderName={isGroup && showAvatar}
-                otherUserAvatar={otherUserAvatar}
-                onReact={handleReact}
-                onReply={handleReply}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onPin={handlePin}
-              />
-            </div>
-          );
-        })}
-
-        <TypingIndicator conversationId={conversationId} />
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Block banner or message input */}
-      {blockStatus.blocked ? (
-        <div className="px-4 py-4 border-t border-white/5 glass">
-          <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
-            <Ban className="w-4 h-4 text-red-400" />
-            <p className="text-sm text-red-400">
-              {blockStatus.blockedBy === user?._id
-                ? 'Bạn đã chặn người này. Bỏ chặn để gửi tin nhắn.'
-                : 'Bạn đã bị chặn nên không thể gửi tin nhắn.'}
-            </p>
-          </div>
+      
+      {isLoading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
         </div>
       ) : (
-        <MessageInput conversationId={conversationId} />
+        <>
+          {/* Messages */}
+          <div
+            ref={messagesContainerRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto px-4 py-4 space-y-1"
+          >
+            {isLoadingMore && (
+              <div className="flex justify-center py-2">
+                <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+              </div>
+            )}
+
+            {currentMessages.map((message, index) => {
+              const senderId = typeof message.senderId === 'object' ? message.senderId._id : message.senderId;
+              const isMine = senderId === user?._id;
+              const showAvatar =
+                !isMine &&
+                (index === 0 ||
+                  (() => {
+                    const prevMsg = currentMessages[index - 1];
+                    const prevSender = prevMsg?.senderId;
+                    const prevSenderId = prevSender && typeof prevSender === 'object'
+                      ? (prevSender as { _id: string })._id
+                      : prevSender;
+                    return prevSenderId !== senderId;
+                  })());
+
+              const isGroup = currentConversation?.type === 'group';
+              const otherMember = !isGroup
+                ? currentConversation?.members.find((m) => {
+                    const mId = typeof m.userId === 'object' ? m.userId._id : m.userId;
+                    return mId !== user?._id;
+                  })
+                : null;
+              const otherUserAvatar = typeof otherMember?.userId === 'object' ? otherMember.userId.avatar : null;
+
+              const handleReact = (emoji: string) => {
+                const socket = getSocket();
+                if (!socket) return;
+                
+                const hasReacted = message.reactions?.find(r => r.userId === user?._id && r.emoji === emoji);
+                if (hasReacted) {
+                  socket.emit('remove_reaction', { messageId: message._id, conversationId, emoji });
+                } else {
+                  socket.emit('add_reaction', { messageId: message._id, conversationId, emoji });
+                }
+              };
+
+              const handleReply = () => {
+                 useChatStore.getState().setReplyingTo(message);
+              };
+
+              const handleEdit = () => {
+                 useChatStore.getState().setEditingMessage(message);
+              };
+
+              const handleDelete = () => {
+                if (window.confirm('Bạn có chắc chắn muốn xóa tin nhắn này?')) {
+                  const socket = getSocket();
+                  socket?.emit('delete_message', { messageId: message._id, conversationId });
+                }
+              };
+
+              const handlePin = () => {
+                const socket = getSocket();
+                const isPinned = currentConversation?.pinnedMessages?.includes(message._id);
+                if (isPinned) {
+                  socket?.emit('unpin_message', { messageId: message._id, conversationId });
+                } else {
+                  socket?.emit('pin_message', { messageId: message._id, conversationId });
+                }
+              };
+
+              return (
+                <div 
+                  key={message._id || message.tempId} 
+                  id={`msg-${message._id}`}
+                  className={`relative transition-all duration-500 ${highlightedMessageId === message._id ? 'highlight-message z-10' : ''}`}
+                >
+                  {currentConversation?.pinnedMessages?.includes(message._id) && (
+                    <div className="flex items-center gap-1.5 ml-12 mb-1 animate-in fade-in slide-in-from-left-2">
+                       <Pin className="w-3 h-3 text-indigo-400 fill-indigo-400/20" />
+                       <span className="text-[10px] text-gray-500 font-medium">Đã ghim</span>
+                    </div>
+                  )}
+                  <MessageBubble
+                    message={message}
+                    isMine={isMine}
+                    showAvatar={showAvatar}
+                    showSenderName={isGroup && showAvatar}
+                    otherUserAvatar={otherUserAvatar}
+                    onReact={handleReact}
+                    onReply={handleReply}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onPin={handlePin}
+                  />
+                </div>
+              );
+            })}
+
+            <TypingIndicator conversationId={conversationId} />
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Floating Scroll to Bottom Button */}
+          {showScrollToBottom && (
+            <button
+              onClick={scrollToBottom}
+              className="absolute bottom-24 right-8 p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-lg transition-all animate-bounce hover:animate-none z-20 group"
+              title="Về tin nhắn mới nhất"
+            >
+              <ArrowDown className="w-5 h-5" />
+              <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-900 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                Về tin nhắn mới nhất
+              </span>
+            </button>
+          )}
+
+          {/* Block banner or message input */}
+          {blockStatus.blocked ? (
+            <div className="px-4 py-4 border-t border-white/5 glass">
+              <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                <Ban className="w-4 h-4 text-red-400" />
+                <p className="text-sm text-red-400">
+                  {blockStatus.blockedBy === user?._id
+                    ? 'Bạn đã chặn người này. Bỏ chặn để gửi tin nhắn.'
+                    : 'Bạn đã bị chặn nên không thể gửi tin nhắn.'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <MessageInput conversationId={conversationId} />
+          )}
+        </>
       )}
     </div>
   );

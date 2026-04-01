@@ -9,6 +9,7 @@ interface ChatState {
   typingUsers: Record<string, string[]>; // conversationId -> userId[]
   replyingTo: Message | null;
   editingMessage: Message | null;
+  scrollToMessageId: string | null;
 
   setConversations: (conversations: Conversation[]) => void;
   updateConversation: (conversation: Conversation) => void;
@@ -16,6 +17,7 @@ interface ChatState {
 
   setReplyingTo: (message: Message | null) => void;
   setEditingMessage: (message: Message | null) => void;
+  setScrollToMessageId: (id: string | null) => void;
 
   setMessages: (conversationId: string, messages: Message[]) => void;
   addMessage: (conversationId: string, message: Message) => void;
@@ -37,7 +39,7 @@ interface ChatState {
   updateMessageReactions: (conversationId: string, messageId: string, reactions: any[]) => void;
   updateMessageContent: (conversationId: string, messageId: string, content: string, isEdited: boolean, updatedAt: string) => void;
   deleteMessageInStore: (conversationId: string, messageId: string) => void;
-  updatePinnedMessages: (conversationId: string, pinnedMessages: string[]) => void;
+  updatePinnedMessages: (conversationId: string, pinnedMessages: (Message | string)[]) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
@@ -48,6 +50,9 @@ export const useChatStore = create<ChatState>((set) => ({
   typingUsers: {},
   replyingTo: null,
   editingMessage: null,
+  scrollToMessageId: null,
+
+  setScrollToMessageId: (id) => set({ scrollToMessageId: id }),
 
   setConversations: (conversations) => set(() => {
     // Deduplicate by _id
@@ -64,10 +69,12 @@ export const useChatStore = create<ChatState>((set) => ({
         // New conversation - add to top
         return { conversations: [updated, ...state.conversations] };
       }
-      // Update existing and move to top
+      // Merge and move to top
       const newConversations = [...state.conversations];
+      const existing = newConversations[index];
+      const updatedConv = { ...existing, ...updated };
       newConversations.splice(index, 1);
-      return { conversations: [updated, ...newConversations] };
+      return { conversations: [updatedConv, ...newConversations] };
     }),
 
   setActiveConversation: (id) => set({ activeConversationId: id }),

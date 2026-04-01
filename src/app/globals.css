@@ -107,6 +107,18 @@ body {
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
+/* Highlight message animation */
+@keyframes highlight-msg {
+  0% { transform: scale(1); background-color: rgba(99, 102, 241, 0); }
+  30% { transform: scale(1.02); background-color: rgba(99, 102, 241, 0.2); }
+  100% { transform: scale(1); background-color: rgba(99, 102, 241, 0); }
+}
+
+.highlight-message {
+  animation: highlight-msg 1.5s ease-in-out;
+  border-radius: 12px;
+}
+
 /* Input focus ring */
 input:focus, textarea:focus {
   outline: none;

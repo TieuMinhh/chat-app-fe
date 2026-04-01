@@ -440,12 +440,12 @@ export function MessageInput({ conversationId }: MessageInputProps) {
       {isRecording ? (
         <VoiceRecorder onSend={handleVoiceSend} onCancel={() => setIsRecording(false)} />
       ) : (
-        <div className="flex items-end gap-2 max-w-5xl mx-auto">
+        <div className="flex items-end gap-1.5 md:gap-2 max-w-5xl mx-auto">
           {/* Attachment button */}
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="p-2.5 rounded-xl text-gray-500 hover:text-indigo-400 hover:bg-white/5 transition-all shrink-0 disabled:opacity-30"
+            className="p-2 md:p-2.5 rounded-xl text-gray-500 hover:text-indigo-400 hover:bg-white/5 transition-all shrink-0 disabled:opacity-30"
             title="Đính kèm tệp"
           >
             {isUploading ? (
@@ -504,12 +504,12 @@ export function MessageInput({ conversationId }: MessageInputProps) {
                 </div>
 
                 {showEmojiPicker && (
-                  <div className="absolute bottom-full right-0 mb-4 z-9999 text-left">
+                  <div className="absolute bottom-full right-0 mb-4 z-9999 text-left scale-90 sm:scale-100 origin-bottom-right">
                      <EmojiPicker 
                       onEmojiClick={onEmojiClick} 
                       theme={'dark' as any}
                       lazyLoadEmojis={true}
-                      width={320}
+                      width={typeof window !== 'undefined' && window.innerWidth < 400 ? 280 : 320}
                       height={400}
                       previewConfig={{ showPreview: false }}
                     />
@@ -517,7 +517,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
                 )}
 
                 {showStickerPicker && (
-                  <div className="absolute bottom-full right-0 mb-4 z-9999 text-left">
+                  <div className="absolute bottom-full right-0 mb-4 z-9999 text-left scale-90 sm:scale-100 origin-bottom-right">
                     <StickerPicker 
                       onSelect={handleStickerSelect}
                       onClose={() => setShowStickerPicker(false)}

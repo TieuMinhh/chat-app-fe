@@ -5,17 +5,20 @@ import { useAuthStore } from '@/stores/authStore';
 import { useChatStore } from '@/stores/chatStore';
 import { ConversationList } from '@/components/chat/ConversationList';
 import api from '@/lib/axios';
-import { LogOut, MessageCircle, Home } from 'lucide-react';
+import { LogOut, MessageCircle, Home, Users, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { ProfileModal } from '@/components/chat/ProfileModal';
-import { getSocket } from '@/lib/socket';
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const { user, logout: authLogout } = useAuthStore();
   const { setConversations } = useChatStore();
   const [showProfile, setShowProfile] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // On mobile, we hide the sidebar if we are in a chat room
+  const isChatRoom = pathname.startsWith('/chat/') && pathname !== '/chat';
 
   useEffect(() => {
     const fetchConversations = async () => {
@@ -41,7 +44,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex h-screen bg-gray-950 overflow-hidden">
       {/* Sidebar */}
-      <div className="w-[360px] flex flex-col border-r border-white/5 bg-(--bg-secondary)">
+      <div className={`
+        ${isChatRoom ? 'hidden md:flex' : 'flex'} 
+        w-full md:w-[360px] flex-col border-r border-white/5 bg-(--bg-secondary)
+      `}>
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
           <button
@@ -82,6 +88,27 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
         <ConversationList />
         
+        {/* Bottom Nav (Mobile Only) */}
+        {!isChatRoom && (
+          <div className="md:hidden flex items-center justify-around px-2 py-3 border-t border-white/5 bg-(--bg-secondary)/80 backdrop-blur-xl">
+             <button className="flex flex-col items-center gap-1 text-indigo-400">
+               <MessageCircle className="w-6 h-6" />
+               <span className="text-[10px] font-medium">Đoạn chat</span>
+             </button>
+             <button className="flex flex-col items-center gap-1 text-gray-500">
+               <Users className="w-6 h-6" />
+               <span className="text-[10px] font-medium">Danh bạ</span>
+             </button>
+             <button 
+               onClick={() => setShowProfile(true)}
+               className="flex flex-col items-center gap-1 text-gray-500"
+             >
+               <Settings className="w-6 h-6" />
+               <span className="text-[10px] font-medium">Cài đặt</span>
+             </button>
+          </div>
+        )}
+
         {/* Profile Modal */}
         {showProfile && (
           <ProfileModal onClose={() => setShowProfile(false)} />
@@ -89,7 +116,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden">
+      <div className={`
+        ${!isChatRoom ? 'hidden md:flex' : 'flex'}
+        flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden
+      `}>
         {children}
       </div>
     </div>
