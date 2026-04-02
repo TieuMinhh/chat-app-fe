@@ -99,9 +99,9 @@ export function MessageBubble({
     const senderName = repliedSender ? (repliedSender.displayName || repliedSender.username) : (isRepliedMine ? 'Bạn' : 'Người dùng');
 
     return (
-      <div className={`mb-1 p-2 rounded-lg bg-white/5 border-l-2 border-indigo-500 text-[11px] max-w-full overflow-hidden ${isMine ? 'mr-1' : 'ml-1'}`}>
+      <div className={`mb-1 p-2 rounded-lg bg-(--bg-tertiary) border-l-2 border-indigo-500 text-[11px] max-w-full overflow-hidden ${isMine ? 'mr-1' : 'ml-1'}`}>
         <p className="font-semibold text-indigo-400 mb-0.5">{senderName}</p>
-        <p className="text-gray-400 truncate">
+        <p className="text-(--text-muted) truncate">
           {repliedMsg.messageType === 'image' ? '📷 Hình ảnh' : 
            repliedMsg.messageType === 'file' ? '📎 Tệp đính kèm' : 
            repliedMsg.content}
@@ -118,17 +118,17 @@ export function MessageBubble({
         href={lp.url} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="mt-2 block rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:bg-white/10 transition-colors shrink-0 max-w-[300px]"
+        className="mt-2 block rounded-xl overflow-hidden bg-(--bg-tertiary) border border-(--border-color) hover:bg-(--bg-hover) transition-all shrink-0 max-w-[300px]"
       >
         {lp.image && (
-          <div className="h-32 w-full overflow-hidden border-b border-white/10">
+          <div className="h-32 w-full overflow-hidden border-b border-(--border-color)">
             <img src={lp.image} alt={lp.title} className="w-full h-full object-cover" />
           </div>
         )}
         <div className="p-2">
-          <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider mb-0.5 truncate">{lp.siteName || new URL(lp.url).hostname}</p>
-          <p className="text-xs font-semibold text-white mb-1 line-clamp-1">{lp.title}</p>
-          {lp.description && <p className="text-[10px] text-gray-400 line-clamp-2">{lp.description}</p>}
+          <p className="text-[10px] text-indigo-500 font-bold uppercase tracking-wider mb-0.5 truncate">{lp.siteName || new URL(lp.url).hostname}</p>
+          <p className="text-xs font-semibold text-(--text-primary) mb-1 line-clamp-1">{lp.title}</p>
+          {lp.description && <p className="text-[10px] text-(--text-muted) line-clamp-2">{lp.description}</p>}
         </div>
       </a>
     );
@@ -150,7 +150,7 @@ export function MessageBubble({
           )}
         </div>
         {message.content && message.content !== imageUrl && (
-          <div className={`px-4 py-2.5 text-sm leading-relaxed mt-1 rounded-2xl shadow-sm ${isMine ? 'message-sent text-white' : 'message-received text-gray-200'}`}>
+          <div className={`px-4 py-2.5 text-sm leading-relaxed mt-1 rounded-2xl shadow-sm ${isMine ? 'message-sent text-white' : 'message-received text-(--text-primary)'}`}>
             {message.content}
           </div>
         )}
@@ -169,12 +169,12 @@ export function MessageBubble({
             <FileText className="w-5 h-5 text-indigo-300" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`text-sm font-medium truncate ${isMine ? 'text-white' : 'text-gray-200'}`}>{attachment.fileName}</p>
-            <p className="text-[10px] text-gray-400 font-mono uppercase">{formatSize(attachment.fileSize)}</p>
+            <p className={`text-sm font-medium truncate ${isMine ? 'text-white' : 'text-(--text-primary)'}`}>{attachment.fileName}</p>
+            <p className="text-[10px] text-(--text-muted) font-mono uppercase">{formatSize(attachment.fileSize)}</p>
           </div>
-          <Download className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors shrink-0" />
+          <Download className="w-4 h-4 text-(--text-muted) group-hover:text-white transition-colors shrink-0" />
         </a>
-        {message.content && <p className={`text-sm mt-2 pt-2 border-t border-white/10 ${isMine ? 'text-white/80' : 'text-gray-300'}`}>{message.content}</p>}
+        {message.content && <p className={`text-sm mt-2 pt-2 border-t border-white/10 ${isMine ? 'text-white/80' : 'text-(--text-secondary)'}`}>{message.content}</p>}
       </div>
     );
   };
@@ -187,7 +187,7 @@ export function MessageBubble({
         <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
           <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
         </div>
-        <audio src={attachment.url} controls className="h-8 max-w-full filter invert" />
+        <audio src={attachment.url} controls className={`h-8 max-w-full ${!isMine ? 'dark:filter dark:invert' : 'filter invert'}`} />
       </div>
     );
   };
@@ -196,7 +196,7 @@ export function MessageBubble({
     <div className="relative group/sticker">
       <img src={message.content} alt="Sticker" className="w-28 h-28 sm:w-36 sm:h-36 object-contain" loading="lazy" />
       {message.status === 'sending' && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/5 rounded-2xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-(--bg-tertiary)/50 rounded-2xl">
           <Loader2 className="w-6 h-6 text-indigo-500 animate-spin" />
         </div>
       )}
@@ -206,7 +206,7 @@ export function MessageBubble({
   if (message.isDeleted) {
     return (
       <div className={`flex ${isMine ? 'justify-end' : 'justify-start'} px-2 mb-1`}>
-        <div className={`px-4 py-2 rounded-2xl bg-white/5 border border-white/5 text-gray-500 text-sm italic max-w-[70%]`}>
+        <div className={`px-4 py-2 rounded-2xl bg-(--bg-tertiary) border border-(--border-color) text-(--text-muted) text-sm italic max-w-[70%]`}>
           Tin nhắn đã bị xóa
         </div>
       </div>
@@ -220,7 +220,7 @@ export function MessageBubble({
           <div className="shrink-0 w-8 h-8 mb-1">
             {showAvatar && sender ? (
               sender.avatar ? (
-                <img src={sender.avatar} alt={sender.displayName || sender.username} className="w-8 h-8 rounded-full object-cover border border-white/5 ring-2 ring-indigo-500/10 shadow-sm" />
+                <img src={sender.avatar} alt={sender.displayName || sender.username} className="w-8 h-8 rounded-full object-cover border border-(--border-color) ring-2 ring-indigo-500/10 shadow-sm" />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-md">
                   {(sender.displayName || sender.username)?.charAt(0).toUpperCase()}
@@ -232,13 +232,13 @@ export function MessageBubble({
 
         <div className={`relative flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
           {!message.isDeleted && (
-            <div className={`absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center bg-gray-900/80 backdrop-blur-md rounded-full border border-white/10 px-1 py-0.5 z-40 shadow-xl ${isMine ? 'right-full mr-2' : 'left-full ml-2'}`}>
+            <div className={`absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center bg-(--bg-secondary) border border-(--border-color) px-1 py-0.5 z-40 shadow-xl ${isMine ? 'right-full mr-2' : 'left-full ml-2'}`}>
               <div className="relative">
-                <button onClick={(e) => { e.stopPropagation(); setShowReactionPicker(!showReactionPicker); }} className="p-1.5 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-amber-400">
+                <button onClick={(e) => { e.stopPropagation(); setShowReactionPicker(!showReactionPicker); }} className="p-1.5 hover:bg-(--bg-hover) rounded-full transition-colors text-(--text-muted) hover:text-amber-500">
                   <Smile className="w-4 h-4" />
                 </button>
                 {showReactionPicker && (
-                  <div className={`absolute bottom-full mb-3 ${isMine ? 'left-0' : 'right-0'} flex items-center gap-1 bg-gray-900/95 backdrop-blur-xl border border-white/10 p-1.5 rounded-full shadow-2xl z-50 animate-in fade-in zoom-in-95`}>
+                  <div className={`absolute bottom-full mb-3 ${isMine ? 'left-0' : 'right-0'} flex items-center gap-1 bg-(--bg-primary) border border-(--border-color) p-1.5 rounded-full shadow-2xl z-50 animate-in fade-in zoom-in-95`}>
                     {COMMON_REACTIONS.map(emoji => (
                       <button key={emoji} onClick={(e) => { e.stopPropagation(); onReact?.(emoji); setShowReactionPicker(false); }} className="hover:scale-125 transition-transform p-1 text-lg leading-none">
                         {emoji}
@@ -247,25 +247,25 @@ export function MessageBubble({
                   </div>
                 )}
               </div>
-              <button onClick={(e) => { e.stopPropagation(); onReply?.(); }} className="p-1.5 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
+              <button onClick={(e) => { e.stopPropagation(); onReply?.(); }} className="p-1.5 hover:bg-(--bg-hover) rounded-full transition-colors text-(--text-muted) hover:text-(--text-primary)">
                 <Reply className="w-4 h-4" />
               </button>
               <div className="relative">
-                <button onClick={(e) => { e.stopPropagation(); setShowMoreActions(!showMoreActions); }} className="p-1.5 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
+                <button onClick={(e) => { e.stopPropagation(); setShowMoreActions(!showMoreActions); }} className="p-1.5 hover:bg-(--bg-hover) rounded-full transition-colors text-(--text-muted) hover:text-(--text-primary)">
                   <MoreVertical className="w-4 h-4" />
                 </button>
                 {showMoreActions && (
-                  <div className={`absolute bottom-full mb-2 ${isMine ? 'right-0' : 'left-0'} min-w-[160px] bg-gray-900 border border-white/10 rounded-xl shadow-2xl p-1 z-50 overflow-hidden animate-in fade-in zoom-in-95`}>
-                    <button onClick={(e) => { e.stopPropagation(); onPin?.(); setShowMoreActions(false); }} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-gray-300 hover:bg-white/5 transition-colors text-left rounded-lg">
+                  <div className={`absolute bottom-full mb-2 ${isMine ? 'right-0' : 'left-0'} min-w-[160px] bg-(--bg-secondary) border border-(--border-color) rounded-xl shadow-2xl p-1 z-50 overflow-hidden animate-in fade-in zoom-in-95`}>
+                    <button onClick={(e) => { e.stopPropagation(); onPin?.(); setShowMoreActions(false); }} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-(--text-secondary) hover:bg-(--bg-hover) transition-colors text-left rounded-lg">
                       <Pin className="w-3.5 h-3.5" /> Ghim tin nhắn
                     </button>
                     {isMine && (
                       <>
-                        <button onClick={(e) => { e.stopPropagation(); onEdit?.(); setShowMoreActions(false); }} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-gray-300 hover:bg-white/5 transition-colors text-left rounded-lg">
+                        <button onClick={(e) => { e.stopPropagation(); onEdit?.(); setShowMoreActions(false); }} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-(--text-secondary) hover:bg-(--bg-hover) transition-colors text-left rounded-lg">
                           <Edit2 className="w-3.5 h-3.5" /> Chỉnh sửa
                         </button>
-                        <div className="h-px bg-white/5 my-1" />
-                        <button onClick={(e) => { e.stopPropagation(); onDelete?.(); setShowMoreActions(false); }} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors text-left rounded-lg">
+                        <div className="h-px bg-(--border-color) my-1" />
+                        <button onClick={(e) => { e.stopPropagation(); onDelete?.(); setShowMoreActions(false); }} className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-red-500 hover:bg-red-500/10 transition-colors text-left rounded-lg">
                           <Trash2 className="w-3.5 h-3.5" /> Xóa
                         </button>
                       </>
@@ -288,7 +288,7 @@ export function MessageBubble({
                message.messageType === 'image' ? renderImage() : 
                message.messageType === 'file' ? renderFile() : 
                message.messageType === 'voice' ? renderVoice() : (
-                <div className={`group/bubble px-4 py-2.5 text-sm leading-relaxed rounded-2xl shadow-sm relative ${isMine ? 'message-sent text-white' : 'message-received text-gray-100 font-light'} ${message.status === 'sending' ? 'opacity-70' : ''}`}>
+                <div className={`group/bubble px-4 py-2.5 text-sm leading-relaxed rounded-2xl shadow-sm relative ${isMine ? 'message-sent text-white' : 'message-received text-(--text-primary)'} ${message.status === 'sending' ? 'opacity-70' : ''}`}>
                   <div className="flex flex-col gap-1">
                     <span>{message.content}</span>
                     {message.isEdited && <span className="text-[9px] opacity-60 self-end">Đã chỉnh sửa</span>}
@@ -297,11 +297,11 @@ export function MessageBubble({
                 </div>
               )}
               {message.reactions && message.reactions.length > 0 && (
-                <div className={`absolute -bottom-2.5 flex items-center gap-0.5 bg-gray-800 border border-white/10 rounded-full px-1.5 py-0.5 shadow-md z-10 ${isMine ? 'right-2' : 'left-2'}`}>
+                <div className={`absolute -bottom-2.5 flex items-center gap-0.5 bg-(--bg-tertiary) border border-(--border-color) rounded-full px-1.5 py-0.5 shadow-md z-10 ${isMine ? 'right-2' : 'left-2'}`}>
                   {Object.entries(reactionGroups || {}).map(([emoji, userIds]) => (
                     <div key={emoji} className="flex items-center gap-0.5 group/react cursor-pointer hover:scale-110 transition-transform">
                       <span className="text-[13px] leading-none">{emoji}</span>
-                      {userIds.length > 1 && <span className="text-[9px] text-gray-400 font-bold">{userIds.length}</span>}
+                      {userIds.length > 1 && <span className="text-[9px] text-(--text-muted) font-bold">{userIds.length}</span>}
                       <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-black text-white text-[10px] rounded opacity-0 group-hover/react:opacity-100 pointer-events-none whitespace-nowrap z-50">
                         {userIds.length} người đã bày tỏ cảm xúc
                       </div>

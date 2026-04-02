@@ -121,12 +121,12 @@ export function ChatHeader({ conversationId, onBlockStatusChange }: ChatHeaderPr
 
   return (
     <>
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 glass">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-(--border-color) glass transition-colors duration-500">
         <div className="flex items-center gap-1 md:gap-3">
           {/* Back Button (Mobile Only) */}
           <button 
             onClick={() => router.push('/chat')}
-            className="md:hidden p-2 -ml-2 text-gray-500 hover:text-white transition-all"
+            className="md:hidden p-2 -ml-2 text-(--text-muted) hover:text-(--text-primary) transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -159,14 +159,14 @@ export function ChatHeader({ conversationId, onBlockStatusChange }: ChatHeaderPr
             </div>
 
             {/* Info */}
-            <div className="flex flex-col text-left max-w-[150px] sm:max-w-xs">
-              <h2 className="text-sm font-semibold text-white truncate">{displayName}</h2>
+            <div className="flex flex-col text-left max-w-[150px] sm:max-w-xs transition-colors duration-500">
+              <h2 className="text-sm font-semibold text-(--text-primary) truncate">{displayName}</h2>
               {blockStatus.blocked ? (
                 <p className="text-[10px] md:text-xs text-red-400">
                   {blockStatus.blockedBy === user?._id ? 'Đã chặn người này' : 'Đã bị chặn'}
                 </p>
               ) : statusText ? (
-                <p className={`text-[10px] md:text-xs truncate ${isOnline || onlineMemberCount > 0 ? 'text-emerald-400' : 'text-gray-500'}`}>
+                <p className={`text-[10px] md:text-xs truncate ${isOnline || onlineMemberCount > 0 ? 'text-emerald-400' : 'text-(--text-muted)'}`}>
                   {statusText}
                 </p>
               ) : null}
@@ -176,28 +176,28 @@ export function ChatHeader({ conversationId, onBlockStatusChange }: ChatHeaderPr
 
         {/* Actions */}
         <div className="flex items-center gap-0.5 md:gap-1">
-          <button className="hidden sm:flex p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+          <button className="hidden sm:flex p-2 rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover) transition-all">
             <Phone className="w-4 h-4" />
           </button>
-          <button className="hidden sm:flex p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+          <button className="hidden sm:flex p-2 rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover) transition-all">
             <Video className="w-4 h-4" />
           </button>
 
           <button 
             onClick={() => setShowPinnedMessages(!showPinnedMessages)}
-            className={`p-2 rounded-lg transition-all relative ${showPinnedMessages ? 'text-indigo-400 bg-indigo-500/10' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+            className={`p-2 rounded-lg transition-all relative ${showPinnedMessages ? 'text-(--accent-primary) bg-(--accent-primary)/10' : 'text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover)'}`}
             title="Tin nhắn đã ghim"
           >
             <Pin className="w-4 h-4" />
             {conversation.pinnedMessages && conversation.pinnedMessages.length > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-indigo-500 rounded-full" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-(--accent-primary) rounded-full" />
             )}
           </button>
 
           {isGroup ? (
             <button
               onClick={() => setShowGroupInfo(true)}
-              className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all"
+              className="p-2 rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover) transition-all"
               title="Thông tin nhóm"
             >
               <Info className="w-4 h-4" />
@@ -206,18 +206,18 @@ export function ChatHeader({ conversationId, onBlockStatusChange }: ChatHeaderPr
             <div className="relative">
               <button
                 onClick={() => setShowMenu(!showMenu)}
-                className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all"
+                className="p-2 rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover) transition-all"
               >
                 <MoreVertical className="w-4 h-4" />
               </button>
               {showMenu && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-                  <div className="absolute right-0 top-full mt-1 w-48 bg-(--bg-tertiary) border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-(--bg-secondary) border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
                     {blockStatus.blocked && blockStatus.blockedBy === user?._id ? (
                       <button
                         onClick={handleBlockToggle}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-emerald-400 hover:bg-white/5 transition-all"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-emerald-400 hover:bg-(--bg-hover) transition-all"
                       >
                         <ShieldOff className="w-4 h-4" />
                         Bỏ chặn
@@ -225,7 +225,7 @@ export function ChatHeader({ conversationId, onBlockStatusChange }: ChatHeaderPr
                     ) : !blockStatus.blocked ? (
                       <button
                         onClick={handleBlockToggle}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-white/5 transition-all"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-(--bg-hover) transition-all"
                       >
                         <Ban className="w-4 h-4" />
                         Chặn người này

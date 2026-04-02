@@ -14,31 +14,42 @@ export const metadata: Metadata = {
   icons: { icon: '/favicon.ico' },
 };
 
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className="dark">
+    <html lang="vi" suppressHydrationWarning>
       <body className={inter.className}>
-        <QueryProvider>
-          <AuthProvider>
-            <SocketProvider>
-              {children}
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  style: {
-                    background: '#1a1a24',
-                    color: '#f0f0f5',
-                    border: '1px solid #2a2a3a',
-                  },
-                }}
-              />
-            </SocketProvider>
-          </AuthProvider>
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryProvider>
+            <AuthProvider>
+              <SocketProvider>
+                {children}
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    style: {
+                      background: 'var(--bg-secondary)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border-color)',
+                      backdropFilter: 'blur(8px)',
+                      borderRadius: '12px',
+                    },
+                  }}
+                />
+              </SocketProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

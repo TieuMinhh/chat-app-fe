@@ -179,26 +179,26 @@ export function GroupInfoPanel({ conversation, onClose }: GroupInfoPanelProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-sm mx-4 bg-(--bg-secondary) rounded-2xl border border-white/5 shadow-2xl animate-slide-up overflow-hidden max-h-[85vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in transition-all">
+      <div className="w-full max-w-sm mx-4 bg-(--bg-secondary) rounded-2xl border border-(--border-color) shadow-2xl animate-slide-up overflow-hidden max-h-[85vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
-          <h3 className="text-base font-semibold text-white">Thông tin nhóm</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-(--border-color) shrink-0">
+          <h3 className="text-base font-semibold text-(--text-primary)">Thông tin nhóm</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover) transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="overflow-y-auto flex-1">
           {/* Group Avatar + Name */}
-          <div className="px-5 py-5 border-b border-white/5">
+          <div className="px-5 py-5 border-b border-(--border-color)/50">
             {/* Avatar */}
             <div className="flex items-center justify-center mb-4">
               <div className="relative group">
                 {conversation.avatar ? (
-                  <img src={conversation.avatar} alt="" className="w-16 h-16 rounded-full object-cover" />
+                  <img src={conversation.avatar} alt="" className="w-16 h-16 rounded-full object-cover border border-(--border-color)" />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-linear-to-br from-indigo-500/30 to-purple-500/30 flex items-center justify-center text-2xl font-bold text-indigo-400">
+                  <div className="w-16 h-16 rounded-full bg-linear-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center text-2xl font-bold text-indigo-500">
                     {(conversation.name || 'G').charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -233,35 +233,35 @@ export function GroupInfoPanel({ conversation, onClose }: GroupInfoPanelProps) {
                 <input
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:border-indigo-500/30"
+                  className="flex-1 px-3 py-2 bg-(--bg-tertiary) border border-(--border-color) rounded-lg text-sm text-(--text-primary) focus:border-(--accent-primary)/50 outline-none"
                   autoFocus
                   onKeyDown={(e) => e.key === 'Enter' && handleUpdateName()}
                 />
-                <button onClick={handleUpdateName} disabled={isSaving} className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30">
+                <button onClick={handleUpdateName} disabled={isSaving} className="p-2 rounded-lg bg-(--accent-primary)/10 text-(--accent-primary) hover:bg-(--accent-primary)/20">
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                 </button>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-2">
-                <h4 className="text-lg font-semibold text-white text-center">{conversation.name || 'Nhóm'}</h4>
+                <h4 className="text-lg font-semibold text-(--text-primary) text-center">{conversation.name || 'Nhóm'}</h4>
                 {isAdmin && (
-                  <button onClick={() => setIsEditing(true)} className="p-1 rounded text-gray-500 hover:text-indigo-400">
+                  <button onClick={() => setIsEditing(true)} className="p-1 rounded text-(--text-muted) hover:text-(--accent-primary)">
                     <Edit3 className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
             )}
-            <p className="text-xs text-gray-500 text-center mt-1">{memberCount} thành viên</p>
+            <p className="text-xs text-(--text-muted) text-center mt-1 font-medium">{memberCount} thành viên</p>
           </div>
 
           {/* Members List */}
           <div className="px-3 py-3">
             <div className="flex items-center justify-between px-2 mb-2">
-              <h5 className="text-xs font-medium text-gray-400 uppercase tracking-wider">Thành viên</h5>
+              <h5 className="text-xs font-bold text-(--text-muted) uppercase tracking-wider">Thành viên</h5>
               {isAdmin && (
                 <button
                   onClick={() => setShowAddMember(!showAddMember)}
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-indigo-400 hover:bg-indigo-500/10 transition-all"
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-(--accent-primary) hover:bg-(--accent-primary)/10 transition-all font-semibold"
                 >
                   <UserPlus className="w-3 h-3" />
                   Thêm
@@ -273,12 +273,12 @@ export function GroupInfoPanel({ conversation, onClose }: GroupInfoPanelProps) {
             {showAddMember && (
               <div className="mb-3 px-1">
                 <div className="relative mb-2">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-(--text-muted)" />
                   <input
                     value={searchQuery}
                     onChange={(e) => handleSearchUsers(e.target.value)}
                     placeholder="Tìm người dùng..."
-                    className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/5 rounded-lg text-xs text-white placeholder-gray-600 focus:border-indigo-500/30"
+                    className="w-full pl-9 pr-3 py-2 bg-(--bg-tertiary) border border-(--border-color) rounded-lg text-xs text-(--text-primary) placeholder-(--text-muted) focus:border-(--accent-primary)/50 outline-none"
                     autoFocus
                   />
                 </div>
@@ -292,17 +292,17 @@ export function GroupInfoPanel({ conversation, onClose }: GroupInfoPanelProps) {
                     key={u._id}
                     onClick={() => handleAddMember(u)}
                     disabled={isAdding}
-                    className="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-white/5 transition-all"
+                    className="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-(--bg-hover) transition-all"
                   >
                     {u.avatar ? (
-                      <img src={u.avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
+                      <img src={u.avatar} alt="" className="w-7 h-7 rounded-full object-cover border border-(--border-color)/50" />
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-indigo-500/20 flex items-center justify-center text-[10px] text-indigo-400 font-semibold">
+                      <div className="w-7 h-7 rounded-full bg-indigo-500/10 flex items-center justify-center text-[10px] text-indigo-500 font-semibold">
                         {(u.displayName || u.username).charAt(0).toUpperCase()}
                       </div>
                     )}
-                    <span className="text-xs text-gray-300 flex-1 text-left">{u.displayName || u.username}</span>
-                    <UserPlus className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="text-xs text-(--text-secondary) flex-1 text-left font-medium">{u.displayName || u.username}</span>
+                    <UserPlus className="w-3.5 h-3.5 text-(--accent-primary)" />
                   </button>
                 ))}
               </div>
@@ -318,37 +318,37 @@ export function GroupInfoPanel({ conversation, onClose }: GroupInfoPanelProps) {
               return (
                 <div
                   key={member._id}
-                  className={`flex items-center gap-3 px-2 py-2 rounded-lg transition-all ${
-                    isAdmin && !isMe ? 'cursor-context-menu hover:bg-white/5' : 'hover:bg-white/5'
+                  className={`flex items-center gap-3 px-2 py-2 rounded-lg transition-all group ${
+                    isAdmin && !isMe ? 'cursor-context-menu hover:bg-(--bg-hover)' : 'hover:bg-(--bg-hover)'
                   }`}
                   onContextMenu={(e) => handleContextMenu(e, member)}
                 >
                   {member.avatar ? (
-                    <img src={member.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
+                    <img src={member.avatar} alt="" className="w-8 h-8 rounded-full object-cover border border-(--border-color)/50" />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-400 font-semibold text-xs">
+                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center text-indigo-500 font-semibold text-xs">
                       {(member.displayName || member.username).charAt(0).toUpperCase()}
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <p className="text-sm text-white truncate">{member.displayName || member.username}</p>
-                      {isMe && <span className="text-[10px] text-gray-500">(Bạn)</span>}
+                      <p className="text-sm text-(--text-primary) truncate font-medium">{member.displayName || member.username}</p>
+                      {isMe && <span className="text-[10px] text-(--text-muted)">(Bạn)</span>}
                       {isMemberAdmin && (
-                        <Crown className="w-3 h-3 text-amber-400 shrink-0" />
+                        <Crown className="w-3 h-3 text-amber-500 shrink-0" />
                       )}
                     </div>
-                    <p className="text-[10px] text-gray-500">@{member.username}</p>
+                    <p className="text-[10px] text-(--text-muted)">@{member.username}</p>
                   </div>
                   {isAdmin && !isMe && (
-                    <span className="text-[9px] text-gray-600 italic opacity-0 group-hover:opacity-100">Chuột phải để kick</span>
+                    <span className="text-[9px] text-(--text-muted) italic opacity-0 group-hover:opacity-100 transition-opacity">Chuột phải để kick</span>
                   )}
                 </div>
               );
             })}
 
             {isAdmin && (
-              <p className="text-[10px] text-gray-600 italic text-center mt-2 px-2">
+              <p className="text-[10px] text-(--text-muted) italic text-center mt-2 px-2">
                 💡 Nhấn chuột phải vào thành viên để kick khỏi nhóm
               </p>
             )}
@@ -356,10 +356,10 @@ export function GroupInfoPanel({ conversation, onClose }: GroupInfoPanelProps) {
         </div>
 
         {/* Footer: Leave Group */}
-        <div className="p-4 border-t border-white/5 bg-black/20 shrink-0">
+        <div className="p-4 border-t border-(--border-color) bg-(--bg-tertiary)/30 shrink-0">
           <button
             onClick={handleLeave}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-500/10 transition-all shadow-sm active:scale-95"
           >
             <LogOut className="w-4 h-4" />
             Rời nhóm
@@ -372,17 +372,17 @@ export function GroupInfoPanel({ conversation, onClose }: GroupInfoPanelProps) {
         <>
           <div className="fixed inset-0 z-60" onClick={() => setContextMenu(null)} />
           <div
-            className="fixed z-70 w-48 bg-(--bg-tertiary) border border-white/10 rounded-xl shadow-2xl overflow-hidden animate-fade-in"
+            className="fixed z-70 w-48 bg-(--bg-secondary) border border-(--border-color) rounded-xl shadow-2xl overflow-hidden animate-fade-in"
             style={{ left: contextMenu.x, top: contextMenu.y }}
           >
-            <div className="px-3 py-2 border-b border-white/5">
-              <p className="text-xs text-gray-400 truncate">
+            <div className="px-3 py-2 border-b border-(--border-color)/50">
+              <p className="text-xs text-(--text-muted) truncate font-medium">
                 {contextMenu.member.displayName || contextMenu.member.username}
               </p>
             </div>
             <button
               onClick={() => handleRemoveMember(contextMenu.member._id, contextMenu.member.displayName || contextMenu.member.username)}
-              className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-all"
+              className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-red-500 hover:bg-red-500/10 transition-all font-medium"
             >
               <UserMinus className="w-4 h-4" />
               Kick khỏi nhóm

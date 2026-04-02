@@ -65,18 +65,18 @@ export default function RegisterPage() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-white mb-6">Tạo tài khoản</h2>
+      <h2 className="text-xl font-semibold text-(--text-primary) mb-6">Tạo tài khoản</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Username */}
         <div>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--text-muted)" />
             <input
               {...formRegister('username')}
               type="text"
               placeholder="Username"
-              className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 transition-all focus:border-indigo-500/50"
+              className="w-full pl-10 pr-4 py-3 bg-(--bg-tertiary) border border-(--border-color) rounded-xl text-(--text-primary) placeholder-(--text-muted) transition-all focus:border-(--accent-primary)/50 outline-none"
             />
           </div>
           {errors.username && (
@@ -87,12 +87,12 @@ export default function RegisterPage() {
         {/* Email */}
         <div>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--text-muted)" />
             <input
               {...formRegister('email')}
               type="email"
               placeholder="Email"
-              className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 transition-all focus:border-indigo-500/50"
+              className="w-full pl-10 pr-4 py-3 bg-(--bg-tertiary) border border-(--border-color) rounded-xl text-(--text-primary) placeholder-(--text-muted) transition-all focus:border-(--accent-primary)/50 outline-none"
             />
           </div>
           {errors.email && (
@@ -103,17 +103,17 @@ export default function RegisterPage() {
         {/* Password */}
         <div>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--text-muted)" />
             <input
               {...formRegister('password')}
               type={showPassword ? 'text' : 'password'}
               placeholder="Mật khẩu"
-              className="w-full pl-10 pr-12 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 transition-all focus:border-indigo-500/50"
+              className="w-full pl-10 pr-12 py-3 bg-(--bg-tertiary) border border-(--border-color) rounded-xl text-(--text-primary) placeholder-(--text-muted) transition-all focus:border-(--accent-primary)/50 outline-none"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-(--text-muted) hover:text-(--text-primary) transition-colors"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -126,12 +126,12 @@ export default function RegisterPage() {
         {/* Confirm Password */}
         <div>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--text-muted)" />
             <input
               {...formRegister('confirmPassword')}
               type={showPassword ? 'text' : 'password'}
               placeholder="Nhập lại mật khẩu"
-              className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 transition-all focus:border-indigo-500/50"
+              className="w-full pl-10 pr-4 py-3 bg-(--bg-tertiary) border border-(--border-color) rounded-xl text-(--text-primary) placeholder-(--text-muted) transition-all focus:border-(--accent-primary)/50 outline-none"
             />
           </div>
           {errors.confirmPassword && (
@@ -154,9 +154,9 @@ export default function RegisterPage() {
         </button>
       </form>
 
-      <p className="text-center text-gray-500 text-sm mt-6">
+      <p className="text-center text-(--text-muted) text-sm mt-6">
         Đã có tài khoản?{' '}
-        <Link href="/login" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+        <Link href="/login" className="text-(--accent-primary) hover:underline font-semibold transition-colors">
           Đăng nhập
         </Link>
       </p>

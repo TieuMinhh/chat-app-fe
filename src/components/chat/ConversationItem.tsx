@@ -212,8 +212,8 @@ export function ConversationItem({ conversation, isActive, currentUserId, onClic
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 transition-all hover:bg-white/5 ${
-        isActive ? 'bg-white/5 border-r-2 border-indigo-500' : ''
+      className={`w-full flex items-center gap-3 px-4 py-3 transition-all hover:bg-(--bg-hover) group ${
+        isActive ? 'bg-(--bg-active) border-r-2 border-(--accent-primary)' : ''
       }`}
     >
       {/* Avatar */}
@@ -224,10 +224,10 @@ export function ConversationItem({ conversation, isActive, currentUserId, onClic
           <img
             src={otherUser.avatar}
             alt={displayName}
-            className="w-12 h-12 rounded-full object-cover"
+            className="w-12 h-12 rounded-full object-cover border border-(--border-color)/50"
           />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-400 font-semibold text-sm">
+          <div className="w-12 h-12 rounded-full bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-indigo-500 font-semibold text-sm">
             {avatarText}
           </div>
         )}
@@ -241,27 +241,27 @@ export function ConversationItem({ conversation, isActive, currentUserId, onClic
       <div className="flex-1 min-w-0 text-left">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 min-w-0">
-            <p className={`text-sm truncate ${isUnread ? 'font-bold text-white' : 'font-medium text-gray-200'}`}>
+            <p className={`text-sm truncate ${isUnread ? 'font-bold text-(--text-primary)' : 'font-medium text-(--text-secondary)'}`}>
               {displayName}
             </p>
             {conversation.type === 'group' && (
-              <span className="text-[10px] text-gray-600 shrink-0">{conversation.members.length}</span>
+              <span className="text-[10px] text-(--text-muted) shrink-0">{conversation.members.length}</span>
             )}
           </div>
           {lastMessageTime && (
-            <span className={`text-xs shrink-0 ml-2 ${isUnread ? 'font-semibold text-white' : 'text-gray-500'}`}>
+            <span className={`text-xs shrink-0 ml-2 ${isUnread ? 'font-bold text-(--accent-primary)' : 'text-(--text-muted)'}`}>
               {lastMessageTime}
             </span>
           )}
         </div>
         <div className="flex items-center justify-between mt-0.5">
-          <p className={`text-xs truncate ${isUnread ? 'font-semibold text-white' : 'text-gray-500'}`}>
+          <p className={`text-xs truncate ${isUnread ? 'font-semibold text-(--text-primary)' : 'text-(--text-muted)'}`}>
             {lastMessageText}
           </p>
           <div className="flex items-center gap-1.5 shrink-0">
             {renderReadReceipt()}
             {isUnread && (
-              <span className="ml-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-indigo-500 text-white text-[10px] font-bold">
+              <span className="ml-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-(--accent-primary) text-white text-[10px] font-bold shadow-sm">
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}

@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 import { VoiceRecorder } from './VoiceRecorder';
 import { StickerPicker } from './StickerPicker';
 import dynamic from 'next/dynamic';
+import { useTheme } from 'next-themes';
 
 const EmojiPicker = dynamic(() => import('emoji-picker-react'), { ssr: false });
 
@@ -26,6 +27,7 @@ interface PendingFile {
 }
 
 export function MessageInput({ conversationId }: MessageInputProps) {
+  const { theme } = useTheme();
   const [content, setContent] = useState('');
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -60,7 +62,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Synchronize content with editingMessage when it changes (Pattern: Adjusting state during render)
+  // Synchronize content with editingMessage when it changes
   const [prevEditingId, setPrevEditingId] = useState<string | undefined>(editingMessage?._id);
   if (editingMessage?._id !== prevEditingId) {
     setPrevEditingId(editingMessage?._id);
@@ -142,7 +144,6 @@ export function MessageInput({ conversationId }: MessageInputProps) {
 
     setPendingFiles((prev) => [...prev, ...newPending]);
 
-    // Reset input
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -161,7 +162,6 @@ export function MessageInput({ conversationId }: MessageInputProps) {
   const onEmojiClick = (emojiData: any) => {
     setContent((prev) => prev + emojiData.emoji);
     inputRef.current?.focus();
-    // Keep picker open if needed, or close it. Usually MessageInput closes it after click.
     setShowEmojiPicker(false);
   };
 
@@ -180,7 +180,6 @@ export function MessageInput({ conversationId }: MessageInputProps) {
     setShowStickerPicker(false);
   };
 
-  // Quick Like (Thumbs up) logic
   const isInputEmpty = !content.trim() && pendingFiles.length === 0 && !editingMessage;
 
   const handleSendOrLike = () => {
@@ -199,7 +198,6 @@ export function MessageInput({ conversationId }: MessageInputProps) {
     const tempId = generateTempId();
     const file = new File([blob], 'voice_message.webm', { type: 'audio/webm' });
 
-    // Optimistic UI
     const optimisticMessage: Message = {
       _id: tempId,
       tempId,
@@ -270,13 +268,11 @@ export function MessageInput({ conversationId }: MessageInputProps) {
 
     const tempId = generateTempId();
 
-    // Determine message type
     let messageType: 'text' | 'image' | 'file' | 'voice' = 'text';
     if (hasFiles) {
       messageType = pendingFiles.some((f) => f.type === 'image') ? 'image' : 'file';
     }
 
-    // Optimistic UI
     const optimisticMessage: Message = {
       _id: tempId,
       tempId,
@@ -305,7 +301,6 @@ export function MessageInput({ conversationId }: MessageInputProps) {
     inputRef.current?.focus();
 
     try {
-      // Upload files if any
       let attachments: Attachment[] = [];
       if (filesToUpload.length > 0) {
         setIsUploading(true);
@@ -318,7 +313,6 @@ export function MessageInput({ conversationId }: MessageInputProps) {
         setIsUploading(false);
       }
 
-      // Emit to server
       socket.emit('send_message', {
         tempId,
         conversationId,
@@ -328,7 +322,6 @@ export function MessageInput({ conversationId }: MessageInputProps) {
         replyTo: replyingTo?._id,
       });
 
-      // Clean up previews
       filesToUpload.forEach((pf) => {
         if (pf.preview) URL.revokeObjectURL(pf.preview);
       });
@@ -382,20 +375,20 @@ export function MessageInput({ conversationId }: MessageInputProps) {
 
   return (
     <div
-      className="px-4 py-3 border-t border-white/5 glass relative"
+      className="px-4 py-3 border-t border-(--border-color) glass relative transition-colors duration-500"
       onDragOver={handleDrag}
       onDrop={handleDrop}
     >
       {/* Reply/Edit indicator */}
       {(replyingTo || editingMessage) && (
-        <div className="flex items-center justify-between gap-3 p-3 mb-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 animate-in slide-in-from-bottom-2">
+        <div className="flex items-center justify-between gap-3 p-3 mb-3 rounded-xl bg-(--accent-primary)/10 border border-(--accent-primary)/20 animate-in slide-in-from-bottom-2">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-1 h-8 rounded-full bg-indigo-500 shrink-0" />
+            <div className="w-1 h-8 rounded-full bg-(--accent-primary) shrink-0" />
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider mb-0.5">
+              <p className="text-[11px] font-bold text-(--accent-primary) uppercase tracking-wider mb-0.5">
                 {replyingTo ? 'Đang trả lời' : 'Đang chỉnh sửa'}
               </p>
-              <p className="text-xs text-gray-400 truncate italic">
+              <p className="text-xs text-(--text-muted) truncate italic">
                 {replyingTo ? 
                   (typeof replyingTo.senderId === 'object' ? replyingTo.senderId.displayName || replyingTo.senderId.username : 'Tin nhắn') + ': ' + replyingTo.content : 
                   editingMessage?.content}
@@ -404,7 +397,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
           </div>
           <button 
             onClick={() => { setReplyingTo(null); setEditingMessage(null); if (editingMessage) setContent(''); }}
-            className="p-1.5 hover:bg-white/10 rounded-full transition-colors text-gray-500 hover:text-white shrink-0"
+            className="p-1.5 hover:bg-(--bg-hover) rounded-full transition-colors text-(--text-muted) hover:text-(--text-primary) shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -417,18 +410,18 @@ export function MessageInput({ conversationId }: MessageInputProps) {
           {pendingFiles.map((pf, index) => (
             <div key={index} className="relative group shrink-0">
               {pf.type === 'image' && pf.preview ? (
-                <div className="w-16 h-16 rounded-xl overflow-hidden border border-white/10 shadow-sm">
+                <div className="w-16 h-16 rounded-xl overflow-hidden border border-(--border-color) shadow-sm">
                   <img src={pf.preview} alt="" className="w-full h-full object-cover" />
                 </div>
               ) : (
-                <div className="w-16 h-16 rounded-xl border border-white/10 bg-white/5 flex flex-col items-center justify-center p-1 shadow-sm">
-                  <FileText className="w-5 h-5 text-gray-400 mb-0.5" />
-                  <span className="text-[8px] text-gray-500 truncate max-w-full font-mono">{pf.file.name.split('.').pop()?.toUpperCase()}</span>
+                <div className="w-16 h-16 rounded-xl border border-(--border-color) bg-(--bg-tertiary) flex flex-col items-center justify-center p-1 shadow-sm">
+                  <FileText className="w-5 h-5 text-(--text-muted) mb-0.5" />
+                  <span className="text-[8px] text-(--text-muted) truncate max-w-full font-mono">{pf.file.name.split('.').pop()?.toUpperCase()}</span>
                 </div>
               )}
               <button
                 onClick={() => removePendingFile(index)}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-gray-900 border border-white/10 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-(--bg-secondary) border border-(--border-color) text-(--text-primary) flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -445,7 +438,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="p-2 md:p-2.5 rounded-xl text-gray-500 hover:text-indigo-400 hover:bg-white/5 transition-all shrink-0 disabled:opacity-30"
+            className="p-2 md:p-2.5 rounded-xl text-(--text-muted) hover:text-(--accent-primary) hover:bg-(--bg-hover) transition-all shrink-0 disabled:opacity-30"
             title="Đính kèm tệp"
           >
             {isUploading ? (
@@ -464,7 +457,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
           />
 
           {/* Text input container */}
-          <div className="flex-1 relative bg-white/5 border border-white/5 rounded-2xl transition-all focus-within:border-indigo-500/30">
+          <div className="flex-1 relative bg-(--bg-tertiary) border border-(--border-color) rounded-2xl transition-all focus-within:border-(--accent-primary)/30">
             <textarea
               ref={inputRef}
               value={content}
@@ -473,7 +466,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
               onPaste={handlePaste}
               placeholder={editingMessage ? "Chỉnh sửa tin nhắn..." : "Nhập tin nhắn..."}
               rows={1}
-              className="w-full px-4 py-3 bg-transparent text-[14px] text-white placeholder-gray-600 resize-none outline-none overflow-y-auto scrollbar-hide"
+              className="w-full px-4 py-3 bg-transparent text-[14px] text-(--text-primary) placeholder-(--text-muted) resize-none outline-none overflow-y-auto scrollbar-hide"
               style={{ maxHeight: '150px' }}
             />
             
@@ -486,7 +479,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
                       setShowStickerPicker(!showStickerPicker);
                       setShowEmojiPicker(false);
                     }}
-                    className={`p-1.5 rounded-lg transition-all ${showStickerPicker ? 'text-indigo-400 bg-indigo-400/10' : 'text-gray-500 hover:text-indigo-400 hover:bg-white/5'}`}
+                    className={`p-1.5 rounded-lg transition-all ${showStickerPicker ? 'text-(--accent-primary) bg-(--accent-primary)/10' : 'text-(--text-muted) hover:text-(--accent-primary) hover:bg-(--bg-hover)'}`}
                     title="Nhãn dán"
                   >
                     <Sticker className="w-5 h-5" />
@@ -496,7 +489,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
                       setShowEmojiPicker(!showEmojiPicker);
                       setShowStickerPicker(false);
                     }}
-                    className={`p-1.5 rounded-lg transition-all ${showEmojiPicker ? 'text-amber-400 bg-amber-400/10' : 'text-gray-500 hover:text-amber-400 hover:bg-white/5'}`}
+                    className={`p-1.5 rounded-lg transition-all ${showEmojiPicker ? 'text-amber-500 bg-amber-500/10' : 'text-(--text-muted) hover:text-amber-500 hover:bg-(--bg-hover)'}`}
                     title="Emoji"
                   >
                     <Smile className="w-5 h-5" />
@@ -507,7 +500,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
                   <div className="absolute bottom-full right-0 mb-4 z-9999 text-left scale-90 sm:scale-100 origin-bottom-right">
                      <EmojiPicker 
                       onEmojiClick={onEmojiClick} 
-                      theme={'dark' as any}
+                      theme={theme as any}
                       lazyLoadEmojis={true}
                       width={typeof window !== 'undefined' && window.innerWidth < 400 ? 280 : 320}
                       height={400}
@@ -528,7 +521,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
               
               <button 
                 onClick={() => setIsRecording(true)}
-                className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-400 hover:bg-white/5 transition-all mr-1"
+                className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--accent-primary) hover:bg-(--bg-hover) transition-all mr-1"
                 title="Ghi âm"
               >
                 <Mic className="w-5 h-5" />
@@ -540,7 +533,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
           <button
             onClick={handleSendOrLike}
             disabled={isUploading}
-            className={`p-3 rounded-2xl transition-all shrink-0 shadow-lg active:scale-95 ${isInputEmpty ? 'text-indigo-400 hover:bg-white/5' : 'text-white'}`}
+            className={`p-3 rounded-2xl transition-all shrink-0 shadow-lg active:scale-95 ${isInputEmpty ? 'text-(--accent-primary) hover:bg-(--bg-hover)' : 'text-white'}`}
             style={{
               background: !isInputEmpty && !isUploading
                 ? 'var(--accent-gradient)'
@@ -551,7 +544,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
             {isInputEmpty ? (
               <ThumbsUp className="w-6 h-6 animate-in zoom-in spin-in-12 duration-300" />
             ) : (
-              <Send className="w-5 h-5 animate-in zoom-in" />
+              <Send className="w-5 h-5" />
             )}
           </button>
         </div>

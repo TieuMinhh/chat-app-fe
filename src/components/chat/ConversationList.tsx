@@ -38,18 +38,18 @@ export function ConversationList() {
       <div className="px-4 py-3 space-y-3">
         <div className="flex items-center gap-2">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-(--text-muted)" />
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm kiếm cuộc trò chuyện..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/5 rounded-xl text-sm text-white placeholder-gray-600 transition-all focus:border-indigo-500/30"
+              className="w-full pl-10 pr-4 py-2.5 bg-(--bg-tertiary) border border-(--border-color) rounded-xl text-sm text-(--text-primary) placeholder-(--text-muted) transition-all focus:border-(--accent-primary)/30"
             />
           </div>
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2.5 rounded-xl bg-white/5 text-gray-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition-all"
+              className="p-2.5 rounded-xl bg-(--bg-tertiary) text-(--text-muted) hover:text-(--accent-primary) hover:bg-(--accent-primary)/10 transition-all border border-(--border-color)"
               title="Tạo mới"
             >
               <Plus className="w-5 h-5" />
@@ -59,17 +59,17 @@ export function ConversationList() {
             {showMenu && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setShowMenu(false)} />
-                <div className="absolute right-0 top-full mt-1 w-52 bg-(--bg-tertiary) border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
+                <div className="absolute right-0 top-full mt-1 w-52 bg-(--bg-secondary) border border-(--border-color) rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
                   <button
                     onClick={() => { setShowNewChat(true); setShowMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-all"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-(--text-secondary) hover:bg-(--bg-hover) hover:text-(--text-primary) transition-all"
                   >
                     <MessageCircle className="w-4 h-4 text-indigo-400" />
                     Chat mới
                   </button>
                   <button
                     onClick={() => { setShowCreateGroup(true); setShowMenu(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-all"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-(--text-secondary) hover:bg-(--bg-hover) hover:text-(--text-primary) transition-all"
                   >
                     <Users className="w-4 h-4 text-purple-400" />
                     Tạo nhóm
