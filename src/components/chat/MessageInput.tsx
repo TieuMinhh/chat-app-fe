@@ -7,7 +7,7 @@ import { getSocket } from '@/lib/socket';
 import { generateTempId } from '@/lib/utils';
 import { Message, Attachment } from '@/types';
 import api from '@/lib/axios';
-import { Send, Paperclip, Smile, X, FileText, Loader2, Mic, Sticker, ThumbsUp } from 'lucide-react';
+import { SendHorizontal, Paperclip, Smile, X, FileText, Loader2, Mic, Sticker, ThumbsUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { VoiceRecorder } from './VoiceRecorder';
 import { StickerPicker } from './StickerPicker';
@@ -544,7 +544,7 @@ export function MessageInput({ conversationId }: MessageInputProps) {
             {isInputEmpty ? (
               <ThumbsUp className="w-6 h-6 animate-in zoom-in spin-in-12 duration-300" />
             ) : (
-              <Send className="w-5 h-5" />
+              <SendHorizontal className="w-5 h-5" />
             )}
           </button>
         </div>
